@@ -1,5 +1,6 @@
 package com.practice.premp.photogallery;
 
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,8 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
+import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,16 +54,16 @@ public class PhotoGalleryFragment extends Fragment {
 
   private class PhotoHolder extends RecyclerView.ViewHolder {
 
-    private TextView mTitleTextView;
+    private ImageView mItemImageView;
 
     public PhotoHolder(View itemView) {
       super(itemView);
 
-      mTitleTextView = (TextView) itemView;
+      mItemImageView = (ImageView) itemView.findViewById(R.id.item_image_view);
     }
 
-    public void bindGalleryItem(GalleryItem item) {
-      mTitleTextView.setText(item.getCaption());
+    public void bindGalleryItem(Drawable drawable) {
+      mItemImageView.setImageDrawable(drawable);
     }
   }
 
@@ -78,14 +78,17 @@ public class PhotoGalleryFragment extends Fragment {
     @NonNull
     @Override
     public PhotoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-      TextView textView = new TextView(getActivity());
-      return new PhotoHolder(textView);
+      LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+      View view = layoutInflater.inflate(R.layout.list_item_gallery,parent,false);
+
+      return new PhotoHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PhotoHolder holder, int position) {
       GalleryItem galleryItem = mGalleryItems.get(position);
-      holder.bindGalleryItem(galleryItem);
+      Drawable placeHolder = getResources().getDrawable(R.drawable.my_image);
+      holder.bindGalleryItem(placeHolder);
     }
 
     @Override
