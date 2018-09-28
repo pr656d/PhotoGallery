@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ public class PhotoGalleryFragment extends Fragment {
 
   private RecyclerView mPhotoRecyclerView;
   private List<GalleryItem> mItems = new ArrayList<>();
+  private ThumbnailDownloader<PhotoHolder> mThumbnailDownloader;
 
   public static PhotoGalleryFragment newInstance() {
     return new PhotoGalleryFragment();
@@ -31,6 +33,11 @@ public class PhotoGalleryFragment extends Fragment {
     super.onCreate(savedInstanceState);
     setRetainInstance(true);
     new FetchItemsTask().execute();
+
+    mThumbnailDownloader = new ThumbnailDownloader<>();
+    mThumbnailDownloader.start();
+    mThumbnailDownloader.getLooper();
+    Log.i(TAG, "Background thread started.");
   }
 
   @Nullable
@@ -46,6 +53,13 @@ public class PhotoGalleryFragment extends Fragment {
     return v;
   }
 
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    mThumbnailDownloader.quit();
+    Log.i(TAG, "Background thread destroyed.");
+  }
+
   private void setupAdapter() {
     if (isAdded()) {    // isAdded() checks for fragment is attached to activity or not.
       mPhotoRecyclerView.setAdapter(new PhotoAdapter(mItems));
@@ -59,7 +73,7 @@ public class PhotoGalleryFragment extends Fragment {
     public PhotoHolder(View itemView) {
       super(itemView);
 
-      mItemImageView = (ImageView) itemView.findViewById(R.id.item_image_view);
+      mItemImageView = itemView.findViewById(R.id.item_image_view);
     }
 
     public void bindGalleryItem(Drawable drawable) {
@@ -85,10 +99,11 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PhotoHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PhotoHolder photoHolder, int position) {
       GalleryItem galleryItem = mGalleryItems.get(position);
       Drawable placeHolder = getResources().getDrawable(R.drawable.my_image);
-      holder.bindGalleryItem(placeHolder);
+      photoHolder.bindGalleryItem(placeHolder);
+      mThumbnailDownloader.queueThumbnail(photoHolder, galleryItem.getUrl());
     }
 
     @Override
