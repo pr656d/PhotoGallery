@@ -44,6 +44,8 @@ public class PhotoGalleryFragment extends Fragment {
     setHasOptionsMenu(true);
     updateItems();
 
+    PollService.setServiceAlarm(getActivity(), true);
+
     Handler responseHandler = new Handler();
     mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
     mThumbnailDownloader.setThumbnailDownloadListener(
@@ -200,7 +202,7 @@ public class PhotoGalleryFragment extends Fragment {
     protected List<GalleryItem> doInBackground(Void... params) {
 
       if (mQuery == null) {
-        return new FlickrFetchr().fetchRecentPhots();
+        return new FlickrFetchr().fetchRecentPhotos();
       } else {
         return new FlickrFetchr().searchPhotos(mQuery);
       }

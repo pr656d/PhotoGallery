@@ -59,7 +59,7 @@ public class FlickrFetchr {
     return new String(getUrlBytes(urlSpec));
   }
 
-  public List<GalleryItem> fetchRecentPhots() {
+  public List<GalleryItem> fetchRecentPhotos() {
     String url = buildUrl(FETCH_RECENTS_METHOD, null);
     return downloadGalleryItems(url);
   }
