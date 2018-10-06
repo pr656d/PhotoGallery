@@ -40,6 +40,8 @@ public class PollService extends IntentService {
       alarmManager.cancel(pi);
       pi.cancel();
     }
+
+    QueryPreferences.setAlarmOn(context, isOn);
   }
 
   public static boolean isServiceAlarmOn(Context context) {
@@ -86,7 +88,7 @@ public class PollService extends IntentService {
 
       // Notification won't work in android 8.0 or above due to background service not allowed.
       // Also NotificationCompat is deprecated so it's slightly changed than written in book.
-      Notification notification = new NotificationCompat.Builder(this, "123")
+      Notification notification = new NotificationCompat.Builder(this, "MyChannel")
           .setTicker(resources.getString(R.string.new_pictures_title))
           .setSmallIcon(android.R.drawable.ic_menu_report_image)
           .setContentTitle(resources.getString(R.string.new_pictures_title))
