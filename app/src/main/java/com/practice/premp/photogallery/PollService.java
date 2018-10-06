@@ -23,6 +23,10 @@ public class PollService extends IntentService {
   // Set interval to 1 min.
   private static final long POLL_INTERVAL_MS = TimeUnit.MINUTES.toMillis(15);
 
+  // This is for dynamic broadcast receiver.
+  public static final String ACTION_SHOW_NOTIFICATION =
+      "com.practice.premp.photogallery.SHOW_NOTIFICATION";
+
   public static Intent newIntent(Context context) {
     return new Intent(context, PollService.class);
   }
@@ -100,7 +104,9 @@ public class PollService extends IntentService {
       NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
       notificationManager.notify(0, notification);
 
-      Log.i(TAG, "NOTIFICATION is notified");
+      sendBroadcast(new Intent(ACTION_SHOW_NOTIFICATION));
+
+//      Log.i(TAG, "NOTIFICATION is notified");
     }
 
     QueryPreferences.setLastResultId(this, resultId);
