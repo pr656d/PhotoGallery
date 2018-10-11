@@ -42,8 +42,8 @@ public class PhotoPageFragment extends VisibleFragment {
       @Nullable Bundle savedInstanceState) {
     View v = inflater.inflate(R.layout.fragment_photo_page, container, false);
 
-    mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
-    mProgressBar.setMax(100); // WebCromeClient reports in range 0-100
+    mProgressBar = v.findViewById(R.id.progress_bar);
+    mProgressBar.setMax(100); // WebChromeClient reports in range 0-100
 
     mWebView = v.findViewById(R.id.web_view);
     mWebView.getSettings().setJavaScriptEnabled(true);
