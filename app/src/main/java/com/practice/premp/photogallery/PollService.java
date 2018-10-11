@@ -1,5 +1,6 @@
 package com.practice.premp.photogallery;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -11,7 +12,6 @@ import android.net.ConnectivityManager;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -21,11 +21,13 @@ public class PollService extends IntentService {
   public static final String TAG = "PollService";
 
   // Set interval to 1 min.
-  private static final long POLL_INTERVAL_MS = TimeUnit.MINUTES.toMillis(15);
+  private static final long POLL_INTERVAL_MS = TimeUnit.MINUTES.toMillis(1);
 
   // This is for dynamic broadcast receiver.
-  public static final String ACTION_SHOW_NOTIFICATION =
-      "com.practice.premp.photogallery.SHOW_NOTIFICATION";
+  public static final String ACTION_SHOW_NOTIFICATION = "com.practice.premp.photogallery.SHOW_NOTIFICATION";
+  public static final String PERM_PRIVATE = "com.practice.premp.photogallery.PRIVATE";
+  public static final String REQUEST_CODE = "REQUEST_CODE";
+  public static final String NOTIFICATION = "NOTIFICATION";
 
   public static Intent newIntent(Context context) {
     return new Intent(context, PollService.class);
@@ -63,7 +65,7 @@ public class PollService extends IntentService {
   @Override
   protected void onHandleIntent(@Nullable Intent intent) {
     Log.i(TAG, "onHandleIntent: called");
-    if(!isNetworkAvailableAndConnected()) {
+    if (!isNetworkAvailableAndConnected()) {
       return;
     }
 
@@ -77,8 +79,9 @@ public class PollService extends IntentService {
       items = new FlickrFetchr().searchPhotos(query);
     }
 
-    if (items.size() == 0)
+    if (items.size() == 0) {
       return;
+    }
 
     String resultId = items.get(0).getId();
     if (resultId.equals(lastResultId)) {
@@ -101,17 +104,21 @@ public class PollService extends IntentService {
           .setAutoCancel(true)
           .build();
 
-      NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-      notificationManager.notify(0, notification);
-
-      sendBroadcast(new Intent(ACTION_SHOW_NOTIFICATION));
-
+      showBackgroundNotification(0, notification);
 //      Log.i(TAG, "NOTIFICATION is notified");
     }
 
     QueryPreferences.setLastResultId(this, resultId);
 
     Log.d(TAG, "Received an intent: " + intent);
+  }
+
+  private void showBackgroundNotification(int requestCode, Notification notification) {
+    Intent i = new Intent(ACTION_SHOW_NOTIFICATION);
+    i.putExtra(REQUEST_CODE, requestCode);
+    i.putExtra(NOTIFICATION, notification);
+    sendOrderedBroadcast(i, PERM_PRIVATE, null, null,
+        Activity.RESULT_OK, null, null);
   }
 
   private boolean isNetworkAvailableAndConnected() {

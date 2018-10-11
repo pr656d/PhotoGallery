@@ -1,5 +1,6 @@
 package com.practice.premp.photogallery;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -8,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -25,7 +25,7 @@ import com.practice.premp.photogallery.ThumbnailDownloader.ThumbnailDownloadList
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotoGalleryFragment extends Fragment {
+public class PhotoGalleryFragment extends VisibleFragment {
 
   public static final String TAG = "PhotoGalleryFragment";
 
@@ -157,18 +157,30 @@ public class PhotoGalleryFragment extends Fragment {
     }
   }
 
-  private class PhotoHolder extends RecyclerView.ViewHolder {
+  private class PhotoHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     private ImageView mItemImageView;
+    private GalleryItem mGalleryItem;
 
     public PhotoHolder(View itemView) {
       super(itemView);
 
       mItemImageView = itemView.findViewById(R.id.item_image_view);
+      itemView.setOnClickListener(this);
     }
 
     public void bindDrawable(Drawable drawable) {
       mItemImageView.setImageDrawable(drawable);
+    }
+
+    public void bindGalleryItem(GalleryItem galleryItem) {
+      mGalleryItem = galleryItem;
+    }
+
+    @Override
+    public void onClick(View v) {
+      Intent i = PhotoPageActivity.newIntent(getActivity(), mGalleryItem.getPhotoPageUri());
+      startActivity(i);
     }
   }
 
@@ -192,6 +204,7 @@ public class PhotoGalleryFragment extends Fragment {
     @Override
     public void onBindViewHolder(@NonNull PhotoHolder photoHolder, int position) {
       GalleryItem galleryItem = mGalleryItems.get(position);
+      photoHolder.bindGalleryItem(galleryItem);
       Drawable placeHolder = getResources().getDrawable(R.drawable.my_image);
       photoHolder.bindDrawable(placeHolder);
       mThumbnailDownloader.queueThumbnail(photoHolder, galleryItem.getUrl());

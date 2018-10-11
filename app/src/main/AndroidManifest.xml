@@ -2,9 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="com.practice.premp.photogallery">
 
+  <permission
+    android:name="com.practice.premp.photogallery.PRIVATE"
+    android:protectionLevel="signature"/>
+
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+  <uses-permission android:name="com.practice.premp.photogallery.PRIVATE"/>
 
   <application
     android:allowBackup="true"
@@ -21,13 +26,26 @@
       </intent-filter>
     </activity>
 
+    <activity android:name=".PhotoPageActivity"/>
+
     <service android:name=".PollService"/>
 
     <receiver android:name=".StartupReceiver">
+
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED"/>
       </intent-filter>
+
     </receiver>
+
+    <receiver
+      android:exported="false"
+      android:name=".NotificationReceiver">
+      <intent-filter android:priority="-999">
+        <action android:name="com.practice.premp.photogallery.SHOW_NOTIFICATION"/>
+      </intent-filter>
+    </receiver>
+
   </application>
 
 </manifest>
